@@ -11,8 +11,6 @@ This project is built as a demo for clean coding, testing, logging, and API docu
 - **SLF4J Logging** for tracking application flow and debugging
 - **Swagger/OpenAPI** integration for interactive API documentation
 - **Spring Data JPA** for database operations
-- Supports **H2 (in-memory)** or **MySQL** database
-
 ---
 
 ## 🛠 Tech Stack
