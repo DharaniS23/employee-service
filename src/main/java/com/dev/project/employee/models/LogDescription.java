@@ -26,6 +26,7 @@ public enum LogDescription {
 	EXCEPTION_OCCURRED_WHILE_UPDATING_EMPLOYEE("Exception occured while updating employee"),
 	EXCEPTION_OCCURRED_WHILE_DELETING_EMPLOYEE("Exception occured while deleting employee"),
 	
+	VALIDATION_FAILED("Validation failed"),
 	EXCEPTION_OCCURED("Exception Ocurred. Reason : ");
 	
 	private final String log;

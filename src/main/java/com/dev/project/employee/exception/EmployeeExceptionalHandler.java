@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.dev.project.employee.models.LogDescription;
 import com.dev.project.employee.models.Response;
 import com.dev.project.employee.models.Status;
 
@@ -31,7 +32,7 @@ public class EmployeeExceptionalHandler {
 
         Response<Object> errorResponse = Response.builder()
                 .status(Status.FAILURE)
-                .message("Validation failed")
+                .message(LogDescription.VALIDATION_FAILED.getLog())
                 .data(errors)
                 .build();
 

@@ -55,15 +55,12 @@ class EmployeeServiceImplTest {
 		// Arrange
 		when(employeeRepository.save(any(Employee.class))).thenReturn(employee);
 
-		// Optional: Create a fake response if you want to override the default method
 		Response<Employee> expectedResponse = new Response<>();
 		expectedResponse.setData(employee);
 		expectedResponse.setMessage(LogDescription.CREATED_EMPLOYEE.getLog());
 		expectedResponse.setStatus(Status.SUCCESS);
 
-		// Mock the default method via spy (optional - use real one if not overridden)
-		doReturn(expectedResponse).when(employeeService).buildSuccessResponse(employee,
-				LogDescription.CREATED_EMPLOYEE,employee.getId());
+		doReturn(expectedResponse).when(employeeService).buildSuccessResponse(employee,LogDescription.CREATED_EMPLOYEE,employee.getId());
 
 		// Act
 		Response<Employee> actualResponse = employeeService.create(employee);
@@ -94,7 +91,7 @@ class EmployeeServiceImplTest {
 
 		assertEquals("Database write error", thrown.getMessage());
 
-		// Verify repository call and NO call to buildSuccessResponse
+		// Verify interactions
 		verify(employeeRepository, times(1)).save(employee);
 		verify(employeeService, never()).buildSuccessResponse(any(), any());
 	}
@@ -114,11 +111,9 @@ class EmployeeServiceImplTest {
 
 		when(employeeRepository.findAll()).thenReturn(mockEmployees);
 
-		// Build expected response using the builder
 		Response<List<Employee>> expectedResponse = Response.<List<Employee>>builder().data(mockEmployees)
-				.message(LogDescription.EMPLOYEE_COUNT_RETRIEVED.getLog()).status(Status.SUCCESS).build();
+				.message(LogDescription.EMPLOYEE_COUNT_RETRIEVED.getLog().formatted(2)).status(Status.SUCCESS).build();
 
-		// Mock buildSuccessResponse(...) from default method
 		doReturn(expectedResponse).when(employeeService).buildSuccessResponse(mockEmployees,
 				LogDescription.EMPLOYEE_COUNT_RETRIEVED, mockEmployees.size());
 
@@ -128,13 +123,12 @@ class EmployeeServiceImplTest {
 		// Assert
 		assertNotNull(actualResponse);
 		assertEquals(2, actualResponse.getData().size());
-		assertEquals(LogDescription.EMPLOYEE_COUNT_RETRIEVED.getLog(), actualResponse.getMessage());
+		assertEquals(LogDescription.EMPLOYEE_COUNT_RETRIEVED.getLog().formatted(2), actualResponse.getMessage());
 		assertEquals(Status.SUCCESS, actualResponse.getStatus());
 
 		// Verify interactions
 		verify(employeeRepository, times(1)).findAll();
-		verify(employeeService, times(1)).buildSuccessResponse(mockEmployees, LogDescription.EMPLOYEE_COUNT_RETRIEVED,
-				mockEmployees.size());
+		verify(employeeService, times(1)).buildSuccessResponse(mockEmployees, LogDescription.EMPLOYEE_COUNT_RETRIEVED,mockEmployees.size());
 	}
 
 	@Test
@@ -156,15 +150,15 @@ class EmployeeServiceImplTest {
 		when(employeeRepository.findAll()).thenReturn(Collections.emptyList());
 
 		Response<List<Employee>> expectedResponse = Response.<List<Employee>>builder().data(Collections.emptyList())
-				.message(LogDescription.EMPLOYEE_COUNT_RETRIEVED.getLog()).status(Status.SUCCESS).build();
+				.message(LogDescription.EMPLOYEE_COUNT_RETRIEVED.getLog().formatted(0)).status(Status.SUCCESS).build();
 
-		doReturn(expectedResponse).when(employeeService).buildSuccessResponse(Collections.emptyList(),
-				LogDescription.EMPLOYEE_COUNT_RETRIEVED, 0);
+		doReturn(expectedResponse).when(employeeService).buildSuccessResponse(Collections.emptyList(),LogDescription.EMPLOYEE_COUNT_RETRIEVED, 0);
 
 		Response<List<Employee>> actualResponse = employeeService.getAll();
 
 		assertNotNull(actualResponse);
 		assertTrue(actualResponse.getData().isEmpty());
+		assertEquals(LogDescription.EMPLOYEE_COUNT_RETRIEVED.getLog().formatted(0), actualResponse.getMessage());
 		assertEquals(Status.SUCCESS, actualResponse.getStatus());
 
 		verify(employeeRepository, times(1)).findAll();
@@ -179,10 +173,9 @@ class EmployeeServiceImplTest {
 		when(employeeRepository.findById(id)).thenReturn(Optional.of(mockEmployee));
 
 		Response<Employee> expectedResponse = Response.<Employee>builder().data(mockEmployee)
-				.message(LogDescription.EMPLOYEE_COUNT_RETRIEVED.getLog()).status(Status.SUCCESS).build();
+				.message(LogDescription.EMPLOYEE_COUNT_RETRIEVED.getLog().formatted(1)).status(Status.SUCCESS).build();
 
-		doReturn(expectedResponse).when(employeeService).buildSuccessResponse(mockEmployee,
-				LogDescription.EMPLOYEE_COUNT_RETRIEVED, 1);
+		doReturn(expectedResponse).when(employeeService).buildSuccessResponse(mockEmployee,LogDescription.EMPLOYEE_COUNT_RETRIEVED, 1);
 
 		// Act
 		Response<Employee> actualResponse = employeeService.getById(id);
@@ -191,7 +184,7 @@ class EmployeeServiceImplTest {
 		assertNotNull(actualResponse);
 		assertEquals("Sheldon", actualResponse.getData().getName());
 		assertEquals(Status.SUCCESS, actualResponse.getStatus());
-		assertEquals(LogDescription.EMPLOYEE_COUNT_RETRIEVED.getLog(), actualResponse.getMessage());
+		assertEquals(LogDescription.EMPLOYEE_COUNT_RETRIEVED.getLog().formatted(1), actualResponse.getMessage());
 
 		verify(employeeRepository, times(1)).findById(id);
 	}
@@ -249,7 +242,6 @@ class EmployeeServiceImplTest {
 
 		Employee updatedEmployee = Employee.builder().name("Fake").email("fake@none.com").department("N/A").build();
 
-		// Mocking repo to simulate employee not found
 		when(employeeRepository.findById(id)).thenReturn(Optional.empty());
 
 		// Act & Assert
